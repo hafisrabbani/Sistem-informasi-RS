@@ -56,7 +56,7 @@ export default {
       try {
         // Fetch data from your API endpoint
         const response = await axios.get(
-          "http://localhost:8001/set/pemeriksaan"
+          "http://103.101.224.67:8080/set/pemeriksaan"
         );
         this.detailkunjugans = response.data.data;
       } catch (error) {

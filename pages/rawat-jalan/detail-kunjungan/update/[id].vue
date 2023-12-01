@@ -103,7 +103,7 @@ export default {
 
         // Make a PATCH request to the API
         const response = await axios.patch(
-          `http://localhost:8001/kunjungan/add-diagnosa-resep/${id}`,
+          `http://103.101.224.67:8080/kunjungan/add-diagnosa-resep/${id}`,
           payload
         );
 

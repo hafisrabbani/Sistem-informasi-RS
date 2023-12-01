@@ -181,7 +181,7 @@ export default {
       try {
         const id = this.$route.params.id;
         const response = await axios.get(
-          `http://localhost:8001/kunjungan/get-submission-data/${id}`
+          `http://103.101.224.67:8080/kunjungan/get-submission-data/${id}`
         );
         this.detailkunjungan = response.data.data;
         console.log("Fetched Data:", this.detailkunjungan);
@@ -201,7 +201,7 @@ export default {
         };
 
         const response = await axios.patch(
-          `http://localhost:8001/kunjungan/add-data-submission/${id}`,
+          `http://103.101.224.67:8080/kunjungan/add-data-submission/${id}`,
           payload
         );
 

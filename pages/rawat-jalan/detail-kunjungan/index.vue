@@ -195,7 +195,7 @@
                   :to="
                     '/rawat-jalan/detail-kunjungan/edit/' + detailkunjungan.id
                   "
-                  class="btn btn-sm btn-secondary"
+                  class="btn btn-sm btn-warning"
                 >
                   <i class="bi-solid bi-pencil"></i>
                 </NuxtLink>
@@ -235,9 +235,9 @@
 
                 <NuxtLink
                   v-if="
-                    detailkunjungan.penanganan ||
-                    detailkunjungan.diagnosa ||
-                    detailkunjungan.resep
+                    detailkunjungan.penanganan &&
+                    !detailkunjungan.diagnosa &&
+                    !detailkunjungan.resep
                   "
                   :to="
                     '/rawat-jalan/detail-kunjungan/update/' + detailkunjungan.id
@@ -289,9 +289,9 @@ export default {
   methods: {
     async fetchData() {
       try {
-        let apiUrl = "http://localhost:8001/kunjungan";
+        let apiUrl = "http://103.101.224.67:8080/kunjungan";
         if (this.selectedSorting !== "semua") {
-          apiUrl = `http://localhost:8001/kunjungan/sorting/${this.selectedSorting}`;
+          apiUrl = `http://103.101.224.67:8080/kunjungan/sorting/${this.selectedSorting}`;
         }
         const response = await axios.get(apiUrl);
         this.detailkunjugans = response.data.data;
@@ -310,7 +310,7 @@ export default {
       if (isConfirmed) {
         const id = detailkunjungan.id;
         axios
-          .delete(`http://localhost:8001/kunjungan/delete-kunjungan/${id}`)
+          .delete(`http://103.101.224.67:8080/kunjungan/delete-kunjungan/${id}`)
           .then((response) => {
             console.log("Data deleted successfully:", response.data);
             this.fetchData();

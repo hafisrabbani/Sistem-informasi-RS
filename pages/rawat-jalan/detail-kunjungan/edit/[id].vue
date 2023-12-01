@@ -231,7 +231,7 @@ export default {
       try {
         const id = this.$route.params.id;
         const response = await axios.get(
-          `http://localhost:8001/kunjungan/get-update-kunjungan/${id}`
+          `http://103.101.224.67:8080/kunjungan/get-update-kunjungan/${id}`
         );
         this.detailkunjungan = response.data.data;
 
@@ -253,7 +253,7 @@ export default {
 
         // Lakukan permintaan PATCH ke API
         const response = await axios.patch(
-          `http://localhost:8001/kunjungan/update-result-kunjungan/${id}`,
+          `http://103.101.224.67:8080/kunjungan/update-result-kunjungan/${id}`,
           payload
         );
 
