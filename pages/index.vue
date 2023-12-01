@@ -212,7 +212,7 @@ import {ref} from 'vue';
 import axios from 'axios';
 
 const baseApi = useRuntimeConfig().public.service_rekam_medis;
-const dataGender = ref([]);
+const dataGender = ref<number[]>([]);
 const dataBPJSAndUmum = ref<any>([]);
 
 const genderChart = {
