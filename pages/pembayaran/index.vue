@@ -199,7 +199,7 @@ methods: {
     async fetchDataArsip(){
         try{
             
-            const res = await axios.get('http://127.0.0.1:8084/pembayaran/ringkasan', {
+            const res = await axios.get('http://103.101.224.67:8084/pembayaran/ringkasan', {
                 headers:
                 {
 
@@ -222,7 +222,7 @@ methods: {
     async fetchDataKeuangan(){
         try{
             
-            const res = await axios.get('http://127.0.0.1:8084/keuangan', {
+            const res = await axios.get('http://103.101.224.67:8084/keuangan', {
                 headers:
                 {
                     'Content-Type' : 'Application/json'
