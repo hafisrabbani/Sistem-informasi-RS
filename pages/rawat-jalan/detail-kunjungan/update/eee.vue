@@ -4,7 +4,7 @@
       <div class="card">
         <div class="container">
           <div class="card-body">
-            <form @submit.prevent="saveData">
+            <form @submit.prevent="submitForm">
               <div class="form-group mb-3">
                 <h6
                   class="card-title"
@@ -18,6 +18,9 @@
                   rows="3"
                 ></textarea>
               </div>
+              <p v-if="errors.diagnosa" class="text-danger">
+                {{ errors.diagnosa[0] }}
+              </p>
               <div class="form-group mb-3">
                 <h6
                   class="card-title"
@@ -31,6 +34,9 @@
                   rows="3"
                 ></textarea>
               </div>
+              <p v-if="errors.resep" class="text-danger">
+                {{ errors.resep[0] }}
+              </p>
               <br />
               <p
                 style="
@@ -49,7 +55,10 @@
                   class="btn btn-light-secondary me-3 mb-1 mt-4"
                   >Kembali</NuxtLink
                 >
-                <button type="submit" class="btn btn-primary me-3 mb-1 mt-4">
+                <button
+                  @click="submitForm"
+                  class="btn btn-primary me-3 mb-1 mt-4"
+                >
                   <i class="fa-regular fa-floppy-disk"></i> Simpan
                 </button>
               </div>
@@ -62,41 +71,26 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   data() {
     return {
-      id:"",
       diagnosa: "",
       resep: "",
-      saving: false,
-      error: null,
+      errors: {},
     };
   },
   methods: {
-    async saveData() {
+    async submitForm() {
       try {
-        this.saving = true;
-        const id = this.$route.params.id;
-        const payload = {
-          diagnosa: this.diagnosa,
-          resep: this.resep,
-        };
+        console.log("Berhasil disimpan!");
 
-        // Make a PATCH request to the API
-        const response = await axios.patch(
-          `http://localhost:8001/kunjungan/add-diagnosa-resep/${id}`,
-          payload
-        );
+        // Reset nilai diagnosa dan resep setelah formulir berhasil disimpan
+        this.diagnosa = "";
+        this.resep = "";
 
-        console.log("Data saved successfully:", response.data);
         this.$router.push("/rawat-jalan/detail-kunjungan");
       } catch (error) {
-        console.error("Error saving data:", error);
-        this.error = "Failed to save data. Please try again.";
-      } finally {
-        this.saving = false;
+        console.error("Gagal menyimpan:", error);
       }
     },
   },
