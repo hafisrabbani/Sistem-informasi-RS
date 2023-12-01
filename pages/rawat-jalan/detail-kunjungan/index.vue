@@ -7,10 +7,26 @@
 
       <div class="card-body">
         <div class="d-flex justify-content-between">
-          <select v-model="selectedSorting" class="form-select w-25" @change="fetchData">
-            <option value="semua" :selected="selectedSorting === 'semua'">Semua Data Kunjungan</option>
-            <option value="belum-pemeriksaan" :selected="selectedSorting === 'belum-pemeriksaan'">Belum Pemeriksaan</option>
-            <option value="sudah-pemeriksaan" :selected="selectedSorting === 'sudah-pemeriksaan'">Sudah Pemeriksaan</option>
+          <select
+            v-model="selectedSorting"
+            class="form-select w-25"
+            @change="fetchData"
+          >
+            <option value="semua" :selected="selectedSorting === 'semua'">
+              Semua Data Kunjungan
+            </option>
+            <option
+              value="belum-pemeriksaan"
+              :selected="selectedSorting === 'belum-pemeriksaan'"
+            >
+              Belum Pemeriksaan
+            </option>
+            <option
+              value="sudah-pemeriksaan"
+              :selected="selectedSorting === 'sudah-pemeriksaan'"
+            >
+              Sudah Pemeriksaan
+            </option>
           </select>
         </div>
         <table class="table table-striped" id="table1">
@@ -202,7 +218,7 @@
                     ) || !detailkunjungan.room
                   "
                   :to="
-                    '/rawat-jalan/detail-kunjungan/add/' + detailkunjungan.id
+                    '/rawat-jalan/detail-kunjungan/show/' + detailkunjungan.id
                   "
                   class="btn btn-sm btn-info block"
                 >
@@ -219,10 +235,9 @@
 
                 <NuxtLink
                   v-if="
-                    (detailkunjungan.poli &&
-                      detailkunjungan.dokter &&
-                      detailkunjungan.diagnosa ||
-                     !detailkunjungan.resep)
+                    detailkunjungan.penanganan ||
+                    detailkunjungan.diagnosa ||
+                    detailkunjungan.resep
                   "
                   :to="
                     '/rawat-jalan/detail-kunjungan/update/' + detailkunjungan.id
@@ -231,6 +246,7 @@
                 >
                   <i class="bi bi-clipboard2-plus-fill"></i>
                 </NuxtLink>
+
                 <button
                   v-else
                   type="button"
@@ -264,7 +280,7 @@ export default {
   data() {
     return {
       detailkunjugans: [],
-       selectedSorting: 'semua',
+      selectedSorting: "semua",
     };
   },
   mounted() {
@@ -274,7 +290,7 @@ export default {
     async fetchData() {
       try {
         let apiUrl = "http://localhost:8001/kunjungan";
-        if (this.selectedSorting !== 'semua') {
+        if (this.selectedSorting !== "semua") {
           apiUrl = `http://localhost:8001/kunjungan/sorting/${this.selectedSorting}`;
         }
         const response = await axios.get(apiUrl);
@@ -286,15 +302,22 @@ export default {
     },
 
     async deleteDetailKunjungan(detailkunjungan) {
-      try {
-        const id = detailkunjungan.id;
-        const response = await axios.delete(`http://localhost:8001/kunjungan/delete-kunjungan/${id}`);
-        console.log("Data deleted successfully:", response.data);
+      const isConfirmed = window.confirm(
+        "Apakah Anda yakin ingin menghapus data ini?"
+      );
 
-        // Setelah berhasil menghapus, refresh data
-        this.fetchData();
-      } catch (error) {
-        console.error("Error deleting data:", error);
+      // Jika dikonfirmasi, hapus data
+      if (isConfirmed) {
+        const id = detailkunjungan.id;
+        axios
+          .delete(`http://localhost:8001/kunjungan/delete-kunjungan/${id}`)
+          .then((response) => {
+            console.log("Data deleted successfully:", response.data);
+            this.fetchData();
+          })
+          .catch((error) => {
+            console.error("Error deleting data:", error);
+          });
       }
     },
   },

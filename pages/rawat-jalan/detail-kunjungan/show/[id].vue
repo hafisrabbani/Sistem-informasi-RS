@@ -3,6 +3,20 @@
     <div class="card">
       <div class="card-content">
         <div class="card-body">
+          <div
+            v-if="successMessage"
+            class="alert alert-success alert-dismissible fade show"
+            role="alert"
+          >
+            {{ successMessage }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+              @click="clearAlert"
+            ></button>
+          </div>
           <form @submit.prevent="saveData">
             <div class="form-body">
               <div class="row">
@@ -145,35 +159,6 @@
   </div>
 </template>
 
-<!-- <script>
-import axios from "axios";
-
-export default {
-  data() {
-    return {
-      detailkunjungan: {},
-    };
-  },
-  mounted() {
-    this.fetchData();
-  },
-  methods: {
-    async fetchData() {
-      try {
-        const id = this.$route.params.id; 
-        const response = await axios.get(
-          `http://localhost:8001/kunjungan/get-submission-data/${id}`
-        );
-        this.detailkunjungan = response.data.data;
-        console.log("Fetched Data:", this.detailkunjungan);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    },
-  },
-};
-</script> -->
-
 <script>
 import axios from "axios";
 
@@ -185,6 +170,7 @@ export default {
       selectedPerawat: "",
       selectedPoli: "",
       selectedRoom: "",
+      successMessage: null,
     };
   },
   mounted() {
@@ -209,22 +195,28 @@ export default {
         const payload = {
           user_id: this.selectedDokter
             ? this.selectedDokter
-            : this.selectedPerawat, // Ganti dengan data yang sesuai
+            : this.selectedPerawat,
           poli_id: this.selectedPoli,
           room_id: this.selectedRoom,
         };
 
-        // Lakukan permintaan PATCH ke API
         const response = await axios.patch(
           `http://localhost:8001/kunjungan/add-data-submission/${id}`,
           payload
         );
 
-        console.log("Data saved successfully:", response.data);
-        this.$router.push("/rawat-jalan/detail-kunjungan");
+        this.successMessage = "Data saved successfully.";
+
+        setTimeout(() => {
+          this.$router.push("/rawat-jalan/detail-kunjungan");
+        }, 3000);
       } catch (error) {
         console.error("Error saving data:", error);
       }
+    },
+
+    clearAlert() {
+      this.successMessage = null;
     },
   },
 };

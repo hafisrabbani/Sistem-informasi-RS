@@ -6,6 +6,20 @@
           <div class="container">
             <div class="card-content">
               <div class="card-body">
+                <div
+                  v-if="successMessage"
+                  class="alert alert-success alert-dismissible fade show"
+                  role="alert"
+                >
+                  {{ successMessage }}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                    @click="clearAlert"
+                  ></button>
+                </div>
                 <form @submit.prevent="submitForm" class="form form-vertical">
                   <div class="form-body">
                     <div class="row">
@@ -44,9 +58,9 @@
                             class="form-select"
                             name="user_id"
                           >
-                          <option value="" selected disabled>
-                            Pilih Penanganan untuk pasien
-                          </option>
+                            <option value="" selected disabled>
+                              Pilih Penanganan untuk pasien
+                            </option>
                             <option
                               v-for="dokter in detailkunjungan.yangMenangani"
                               :key="dokter.id"
@@ -55,7 +69,8 @@
                               000{{ dokter.id }} {{ dokter.name }}
                             </option>
                           </select>
-                           Penanganan Sebelumnya : {{ detailkunjungan.dokterNama }}
+                          Penanganan Sebelumnya :
+                          {{ detailkunjungan.dokterNama }}
                         </div>
                       </div>
 
@@ -76,7 +91,8 @@
                             class="form-control"
                             placeholder="Diagnosa"
                           />
-                            Diagnosa Sebelumnya : {{ detailkunjungan.dataDiagnosa }}
+                          Diagnosa Sebelumnya :
+                          {{ detailkunjungan.dataDiagnosa }}
                         </div>
                       </div>
                       <div class="form-group mb-3">
@@ -87,7 +103,7 @@
                             font-family: 'Montserrat', sans-serif;
                           "
                         >
-                          Resep 
+                          Resep
                         </h6>
                         <input
                           v-model="resep"
@@ -97,8 +113,6 @@
                         />
                         Resep Sebelumnya : {{ detailkunjungan.dataResep }}
                       </div>
-                     
-                      
 
                       <div class="form-group mb-3">
                         <h6
@@ -126,7 +140,7 @@
                             {{ poli.name_poli }}
                           </option>
                         </select>
-                         Poli Sebelumnya : {{ detailkunjungan.poliNama }}
+                        Poli Sebelumnya : {{ detailkunjungan.poliNama }}
                       </div>
 
                       <div class="form-group mb-3">
@@ -155,7 +169,7 @@
                             {{ room.no_room }} - {{ room.name_room }}
                           </option>
                         </select>
-                         Room Sebelumnya : {{ detailkunjungan.roomNama }}
+                        Room Sebelumnya : {{ detailkunjungan.roomNama }}
                       </div>
 
                       <br /><br />
@@ -206,6 +220,7 @@ export default {
       selectedRoom: "",
       diagnosa: "",
       resep: "",
+      successMessage: null,
     };
   },
   mounted() {
@@ -219,6 +234,7 @@ export default {
           `http://localhost:8001/kunjungan/get-update-kunjungan/${id}`
         );
         this.detailkunjungan = response.data.data;
+
         console.log("Fetched Data:", this.detailkunjungan);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -241,11 +257,18 @@ export default {
           payload
         );
 
-        console.log("Data saved successfully:", response.data);
-        this.$router.push("/rawat-jalan/detail-kunjungan");
+        this.successMessage = "Data saved successfully.";
+
+        setTimeout(() => {
+          this.$router.push("/rawat-jalan/detail-kunjungan");
+        }, 3000);
       } catch (error) {
         console.error("Error saving data:", error);
       }
+    },
+
+    clearAlert() {
+      this.successMessage = null;
     },
   },
 };

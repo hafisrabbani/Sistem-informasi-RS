@@ -4,6 +4,22 @@
       <div class="card">
         <div class="container">
           <div class="card-body">
+            <!-- Bootstrap Alert -->
+            <div
+              v-if="successMessage"
+              class="alert alert-success alert-dismissible fade show"
+              role="alert"
+            >
+              {{ successMessage }}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+                @click="clearAlert"
+              ></button>
+            </div>
+
             <form @submit.prevent="saveData">
               <div class="form-group mb-3">
                 <h6
@@ -67,11 +83,12 @@ import axios from "axios";
 export default {
   data() {
     return {
-      id:"",
+      id: "",
       diagnosa: "",
       resep: "",
       saving: false,
       error: null,
+      successMessage: null,
     };
   },
   methods: {
@@ -91,13 +108,23 @@ export default {
         );
 
         console.log("Data saved successfully:", response.data);
-        this.$router.push("/rawat-jalan/detail-kunjungan");
+
+        this.successMessage = "Data saved successfully.";
+
+        setTimeout(() => {
+          this.$router.push("/rawat-jalan/detail-kunjungan");
+        }, 3000);
       } catch (error) {
         console.error("Error saving data:", error);
         this.error = "Failed to save data. Please try again.";
       } finally {
         this.saving = false;
       }
+    },
+
+    // Clear the success message
+    clearAlert() {
+      this.successMessage = null;
     },
   },
 };
