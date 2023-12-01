@@ -27,20 +27,40 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    data() {
-      return {
-        selectedPasien: null,
-        tanggalKunjungan: null,
-        keluhan: '',
-        pasien: [], 
-      };
-    },
-    methods: {
-      submitForm() {
-        
-      },
-    },
+  <script setup lang="ts">
+  const config = useRuntimeConfig().public;
+  import { ref } from 'vue';
+  import axios from 'axios';
+  import { useRouter } from 'vue-router';
+  const pasien = ref([]);
+  const selectedPasien = ref('');
+  const tanggalKunjungan = ref('');
+  const keluhan = ref('');
+
+  const router = useRouter();
+  const fetchPasien = async () => {
+    try {
+      const { data } = await axios.get(`${config.service_rekam_medis}/pasien`);
+      pasien.value = data.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  fetchPasien();
+
+
+  const submitForm = async () => {
+    try {
+      const { data } = await axios.post(`${config.service_rekam_medis}/kunjungan`, {
+        pasien_id: selectedPasien.value,
+        tanggal_kunjungan: tanggalKunjungan.value,
+        keluhan: keluhan.value,
+      });
+
+      router.push('/rekam-medis/entry-kunjungan');
+
+    } catch (error) {
+      console.log(error);
+    }
   };
   </script>
