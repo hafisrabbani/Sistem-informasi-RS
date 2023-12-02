@@ -181,7 +181,7 @@
           </div>
           <div class="card">
             <div class="card-header">
-              <h4>Budi Cayo!</h4>
+              <h4>{{ greeting }}</h4>
             </div>
             <div class="card-content pb-4">
               <div class="recent-message d-flex px-4 py-3">
@@ -190,13 +190,14 @@
                   <i class="bi bi-megaphone"></i>
                 </div>
                 <div class="name ms-4">
-                  <h5 class="mb-1">Kepada Seluruh Admin</h5>
-                  <h6 class="text-muted mb-0">Jangan Lupa Makan :>, Semangat Selalu!</h6>
+                  <h5 class="mb-1">Hello Admin!</h5>
+                  <h6 class="text-muted mb-0">Welcome to the command center where every click is a step towards success</h6>
                 </div>
               </div>
 
               <div class="px-4">
-                <button class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>Memukul Orang Sidoarjo</button>
+                <button class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>Enjoy
+                  <br> Exploring 🙌🏼</button>
               </div>
             </div>
           </div>
@@ -214,6 +215,8 @@ import axios from 'axios';
 const baseApi = useRuntimeConfig().public.service_rekam_medis;
 const dataGender = ref<number[]>([]);
 const dataBPJSAndUmum = ref<any>([]);
+const greeting = ref('');
+const currentTime = new Date().getHours();
 
 const genderChart = {
   chartOptions: {
@@ -250,7 +253,7 @@ const optionsProfileVisit = {
     opacity: 1
   },
   plotOptions: {},
-  colors: '#435ebe',
+  colors: ['#58ffc5','#435ebe'],
   xaxis: {
     categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   },
@@ -278,8 +281,20 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  fetchData();
+  updateGreetings();
 });
 
-</script>
+function updateGreetings() {
+  if (currentTime >= 5 && currentTime < 12) {
+    greeting.value = 'Good Morning ☀️';
+  } else if (currentTime >= 12 && currentTime < 18) {
+    greeting.value = 'Good Afternoon 🌤️';
+  } else {
+    greeting.value = 'Good Evening 🌙';
+  }
+}
 
+onMounted(() => {
+  fetchData();
+});
+</script>
