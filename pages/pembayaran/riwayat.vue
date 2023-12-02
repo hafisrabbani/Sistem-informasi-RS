@@ -27,8 +27,8 @@
                     <tbody>
                       <tr v-for="row in invoice" :key="row.id" class="">
                         <td class="px-4">{{ row.created_at }}</td>
-                        <td class="px-4">{{ row.dkunjungan.kunjungan.pasien.nama }}</td>
-                        <td class="px-4">{{ row.dkunjungan.pembayaran }}</td>
+                        <td class="px-4">{{ row.pasien.nama }}</td>
+                        <td class="px-4">{{ row.detail_kunjungan.pembayaran }}</td>
                         <td class="px-4 text-center">
                           <a class="m-1 rounded bg-success btn p-1 px-4 text-center fw-bolder text-white">
                             SUCCESS
@@ -54,7 +54,7 @@
                               <div class="modal-content">
                                 <div class="modal-header">
                                   <h5 class="modal-title" :id="'paymentSuccessDetail' + row.id + 'Title'">
-                                    Receipt Pasien / {{ row.dkunjungan.kunjungan.pasien.nama }}
+                                    Receipt Pasien / {{ row.pasien.nama }}
                                   </h5>
                                   <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
@@ -84,18 +84,18 @@
                                       
                                       <tbody class="fw-normal">
                                         
-                                        <tr v-if="row.dkunjungan.apotek_id">
+                                        <tr v-if="row.resep">
                                           <th colspan="6" class="p-2 fw-bolder">
                                             <div style="padding: 0 0 0 80px; border-bottom: 0px;" class="text-start">Drugs</div>
                                           </th>
                                         </tr>
-                                        <tr v-for="(item, index) in row.apotek" :key="index" class="fw-normal">
+                                        <tr v-if="row.resep" v-for="(item, index) in row.resep.detail_resep" :key="index" class="fw-normal">
                                           <th class="fw-normal">{{ index + 1 }}</th>
-                                          <th class="fw-normal px-4 text-start">{{ item.drug.name }}</th>
-                                          <th class="fw-normal">-</th>
-                                          <th class="fw-normal px-4 text-start">@money(item.drug.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.name }}</th>
+                                          <th class="fw-normal">{{ item.detail_obat.how_to_use }}</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.price }}</th>
                                           <th class="fw-normal">{{ item.quantity }}</th>
-                                          <th class="fw-normal px-4 text-start">@money(item.drug.price * item.quantity)</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.price * item.quantity }}</th>
                                         </tr>
 
                                         
@@ -114,18 +114,18 @@
                                         </tr>
 
                                         
-                                        <tr v-if="row.dkunjungan.lab != null">
+                                        <tr v-if="row.result_lab">
                                           <th colspan="6" class="p-2 fw-bolder">
                                             <div style="padding: 0 0 0 80px;" class="text-start">Labs</div>
                                           </th>
                                         </tr>
-                                        <tr v-for="(lab, labIndex) in row.dkunjungan.lab" :key="labIndex" class="fw-normal">
+                                        <tr v-if="row.result_lab" v-for="(lab, labIndex) in row.result_lab" :key="labIndex" class="fw-normal">
                                           <th class="fw-normal">{{ labIndex + 1 }}</th>
-                                          <th class="fw-normal px-4 text-start">{{ lab.name }}</th>
-                                          <th class="fw-normal">{{ lab.description || '-' }}</th>
-                                          <th class="fw-normal px-4 text-start">@money(lab.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{ lab.lab.name }}</th>
+                                          <th class="fw-normal">{{ lab.lab.description || '-' }}</th>
+                                          <th class="fw-normal px-4 text-start">{{lab.lab.price}}</th>
                                           <th class="fw-normal">1</th>
-                                          <th class="fw-normal px-4 text-start">@money(lab.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{lab.lab.price}}</th>
                                         </tr>
                                       </tbody>
                                     </table>
@@ -140,7 +140,7 @@
                                       </div>
                                       <div class="text-start d-flex fw-bold" style="margin: 0 35px 0 0;">
                                         <div class="mx-4">Total Biaya</div>
-                                        <div class="mx-2">{{ row.dkunjungan.pembayaran }}</div>
+                                        <div class="mx-2">{{ row.detail_kunjungan.pembayaran }}</div>
                                       </div>
                                     </div>
                                   </div>
@@ -150,7 +150,7 @@
                                     <i class="bx bx-x d-block d-sm-none"></i>
                                     <span class="d-none d-sm-block fw-bold">CLOSE</span>
                                   </button>
-                                  <a class="btn btn-dark ms-1" :href="`/pembayaran-riwayat-cetak/${row.id}`" download>
+                                  <a class="btn btn-dark ms-1" :href="``" download>
                                     <i class="bx bx-check d-block d-sm-none"></i>
                                     <span class="d-none d-sm-block fw-bold">CETAK</span>
                                   </a>
@@ -174,7 +174,7 @@
                     <select name="" id="" disabled>
                       <option value="15" class="disabled" selected>10</option>
                     </select>
-                    results of {{ invoice.total }}
+                    results of {{ invoice ? invoice.length : '0' }}
                   </p>
                 </ul>
                 <ul class="pagination pagination-primary  justify-content-end">
@@ -189,36 +189,40 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import axios from 'axios';
+
+
+
 export default {
   data() {
     return {
-      invoice: [{
-          id: 1,
-          created_at: '2023-01-01',
-          dkunjungan: {
-            kunjungan: {
-              pasien: {
-                nama: 'John Doe'
-              }
-            },
-            pembayaran: 500.00
-          }
-        },
-        {
-          id: 2,
-          created_at: '2023-01-01',
-          dkunjungan: {
-            kunjungan: {
-              pasien: {
-                nama: 'John B'
-              }
-            },
-            pembayaran: 500.00
-          }
-        },], // Set your invoice data here
+      invoice : null as any
     };
   },
-  
+  methods:{
+    async fetchDataInvoice(){
+      try{
+
+        const res = await axios.get('http://103.101.224.67:8084/pembayaran/riwayat',{
+          headers:{
+            "Content-Type" : 'application/json'
+          }
+        })
+        
+        if(res.status == 200){
+          const data = await res.data
+          
+          this.invoice = data
+          console.log(data)
+        }
+      }catch(error:any){
+        console.error(error.message)
+      }
+    }
+  },
+  mounted(){
+    this.fetchDataInvoice()
+  }
 };
 </script>

@@ -236,7 +236,7 @@ methods: {
             
 
         }catch(error){
-            console.error("err!")
+            console.error(error)
         }
     },
     formatDate(dateString: string): string {
