@@ -1,46 +1,4 @@
-<script setup lang="ts">
-    const dataTable = {
 
-        
-    plotOptions : {
-    colors: [ "#F8C300","#E27483"],
-    series: [{
-    name: 'Pemasukan',
-    data: [
-        
-        ]
-        
-    }, {
-        name: 'Pengeluaran',
-        data: [
-            
-            ]
-        }],
-        chart: {
-            height: 350,
-            type: 'area'
-        },
-    dataLabels: {
-        enabled: false
-    },
-    stroke: {
-        curve: 'smooth'
-    },
-    xaxis: {
-        type: 'datetime',
-        categories: [
-            
-            ]
-        },
-        tooltip: {
-            x: {
-                format: 'dd/MM/yy HH:mm'
-            },
-    },
-    }
-}
-    
-</script>
 
 <template>
 <div class="page-heading">
@@ -65,7 +23,7 @@
                                 </div>
                                 <div class="flex-fill">
                                     <div>
-                                        <h3>$totalIncome</h3>
+                                        <h3 >{{ arsip?.total_income }}</h3>
                                         <p class="text-bold fw-bold">TOTAL PEMASUKAN</p>
                                     </div>
                                 </div>
@@ -93,7 +51,7 @@
                                 </div>
                                 <div class="flex-fill">
                                     <div>
-                                        <h3>$totalOutcome</h3>
+                                        <h3>{{ arsip.total_outcome }}</h3>
                                         <p class="text-bold fw-bold">TOTAL PENGELUARAN</p>
                                     </div>
                                 </div>
@@ -108,12 +66,16 @@
             <div class="card-header">
                 <h4 class="card-title">Grafik Keuangan</h4>
             </div>
-                <div class="card-body d-flex justify-content-center" id="keuanganChart">
-                    <apexchart
-                                  height="300"
-                                  :options="dataTable"
-                                  :series="dataTable.plotOptions.series"
-                                ></apexchart>
+                <div class="card-body d-flex justify-content-center w-100 " id="keuanganChart">
+                    <client-only>
+                        <apexchart
+                        class="w-100 "
+                        height="350"
+                        type="area" 
+                        :options="chartOptions"
+                        :series="series"
+                        ></apexchart>
+                    </client-only>
                 </div>
             
         </div>
@@ -141,13 +103,13 @@
                         </tr>
 
                         </thead>
-                        <tbody>
+                        <tbody v-for="(duit,index) in keuangan">
                             
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td>- </td>
-                                    <td>+ </td>
+                                    <td>{{ index+1 }}</td>
+                                    <td>{{ formatDate(duit.tanggal_arsip) }}</td>
+                                    <td>- {{  duit.pengeluaran}}</td>
+                                    <td>+ {{  duit.pemasukan }}</td>
                                     <td>-</td>
                                 </tr>
                            
@@ -159,3 +121,140 @@
 </div>
     
 </template>
+
+<script lang="ts">
+interface ApiResponse {
+  tanggal_arsip: string;
+  pemasukan:string;
+  pengeluaran:string;
+}
+
+import axios from 'axios';
+
+
+import { defineAsyncComponent } from 'vue'
+
+const VueApexCharts = defineAsyncComponent(() =>
+  import('vue3-apexcharts')
+)
+
+export default {
+  name: 'keuanganTable',
+  components: {
+    apexchart: VueApexCharts
+  },
+  data(){
+    return{
+
+        series: [{
+            color: 'yellow',
+            name: 'pemasukan',
+            data: null,
+            
+        }, {
+            color: 'red',
+            name: 'pengeluaran',
+            data: null
+        }],
+        chartOptions: {
+            chart: {
+                height: 350,
+                width: '100%',
+                type: 'area'
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            xaxis: {
+                
+                categories: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+                ]
+            },
+            
+        },
+    arsip : {
+        total_income : 0,
+        total_outcome: 0,
+    },
+    keuangan: [] as ApiResponse[]
+}
+},
+methods: {
+    
+    async fetchDataArsip(){
+        try{
+            
+            const res = await axios.get('http://103.101.224.67:8084/pembayaran/ringkasan', {
+                headers:
+                {
+
+                    'Content-Type' : 'Application/json'
+                }
+            })
+            if(res.status == 200){
+                const data = res.data
+                this.arsip = data?.data
+                this.series[0].data = data?.data.income_month
+                this.series[1].data = data?.data.outcome_month
+                
+            }
+        }catch (err){
+            console.error("err!")
+        }
+
+    },
+
+    async fetchDataKeuangan(){
+        try{
+            
+            const res = await axios.get('http://103.101.224.67:8084/keuangan', {
+                headers:
+                {
+                    'Content-Type' : 'Application/json'
+                }
+            })
+            if(res.status == 200){
+                const data = res.data
+                this.keuangan = data
+                
+            }
+            
+
+        }catch(error){
+            console.error(error)
+        }
+    },
+    formatDate(dateString: string): string {
+      const date = new Date(dateString);
+      
+     
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); 
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    },
+
+    
+    },
+    mounted(){
+    this.fetchDataArsip()
+    this.fetchDataKeuangan()
+    }
+}
+</script>

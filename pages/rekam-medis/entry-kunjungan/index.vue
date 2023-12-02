@@ -17,7 +17,7 @@
                 <tr>
                   <th>No Kunjungan</th>
                   <th>Nama Pasien</th>
-                  <th>No. BPJS</th>
+                  <th>Keluhan</th>
                   <th>Tanggal Kunjungan</th>
                   <th>Detail</th>
                 </tr>
@@ -25,8 +25,8 @@
               <tbody>
                 <tr v-for="(item, index) in kunjungan" :key="index + 1">
                   <td>{{ index + 1 }}</td>
-                  <td>{{ item.pasien.nama }}</td>
-                  <td>{{ item.pasien.no_bpjs }}</td>
+                  <td>{{ item.nama_pasien }}</td>
+                  <td>{{ item.keluhan }}</td>
                   <td>{{ item.tanggal_kunjungan }}</td>
                   <td>
                     <NuxtLink :to="'./entry-kunjungan/detail/' + item.id" class="btn btn-primary">
@@ -42,29 +42,23 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    data() {
-      return {
-        kunjungan: [{
-          id: 1,
-          pasien: {
-            nama: 'John Doe',
-            no_bpjs: '1234567890',
-          },
-          tanggal_kunjungan: '2023-11-22',
-        },
-        {
-          id: 2,
-          pasien: {
-            nama: 'Jane Doe',
-            no_bpjs: '0987654321',
-          },
-          tanggal_kunjungan: '2023-11-23',
-        },], 
-      };
-    },
+  <script setup lang="ts">
+  import { ref } from 'vue';
+  import axios from 'axios';
+  const config = useRuntimeConfig().public;
+  const kunjungan = ref([]);
+
+  const fetchKunjungan = async () => {
+    try {
+      const { data } = await axios.get(`${config.service_rekam_medis}/kunjungan`);
+      kunjungan.value = data.data;
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  fetchKunjungan();
+
   </script>
   
   
