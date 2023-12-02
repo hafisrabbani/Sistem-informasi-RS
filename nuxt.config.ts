@@ -26,6 +26,7 @@ export default defineNuxtConfig({
             'Nunito': true,
         },
     },
+
     runtimeConfig: {
         public: {
             service_rekam_medis: 'http://103.101.224.67:8081/api/v1',

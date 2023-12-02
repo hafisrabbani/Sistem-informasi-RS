@@ -36,5 +36,19 @@
     "sass-loader": "^13.3.2",
     "sweetalert2": "^11.6.13",
     "vue3-apexcharts": "^1.4.4"
-  }
+  },
+  "description": "Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hafisrabbani/Sistem-informasi-RS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hafisrabbani/Sistem-informasi-RS/issues"
+  },
+  "homepage": "https://github.com/hafisrabbani/Sistem-informasi-RS#readme"
 }
