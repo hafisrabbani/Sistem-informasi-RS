@@ -18,8 +18,7 @@
                     </div>
                   </div>
                 </div>
-  
-                <div class="row">
+                  <div class="row">
                   <div>
                     <div class="table-responsive rounded border">
                       <table class="table table-xs justify-content-start ">
@@ -32,11 +31,12 @@
                             <th class="fw-bold px-4 text-center">Action</th>
                           </tr>
                         </thead>
+                        
                         <tbody>
                           <tr v-for="row in invoice" :key="row.id" class="">
                             <td class="px-4">{{ row.created_at }}</td>
-                            <td class="px-4">{{ row.dkunjungan.kunjungan.pasien.nama }}</td>
-                            <td class="px-4">{{row.dkunjungan.pembayaran}}</td>
+                            <td class="px-4">{{ row.pasien.nama }}</td>
+                            <td class="px-4">{{row.detail_kunjungan.pembayaran}}</td>
                             <td class="px-4 text-center">
                                 <a
                                     class="m-1 btn-danger btn p-1 px-4 text-center"
@@ -46,12 +46,12 @@
                                     <span class="d-none d-sm-block fw-bolder">Pending</span>
                                 </a>
                                 <div :id="'paymentPending' + row.id" class="modal fade" tabindex="-1" :aria-labelledby="'paymentPending' + row.id + 'Title'" style="display: none;" aria-hidden="true">
-                                    <form class="form form-horizontal" :action="`/pembayaran-transaksi-update/${row.dkunjungan.kunjungan.id}`" method="POST">
-                                    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable" role="document">
+                                    <form class="form form-horizontal">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable">
                                         <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" :id="'paymentPending' + row.id + 'Title'">
-                                            Konfirmasi Pembayaran / {{ row.dkunjungan.kunjungan.pasien.nama }}
+                                            Konfirmasi Pembayaran / {{ row.pasien.nama }}
                                             </h5>
                                             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
@@ -74,13 +74,13 @@
                                                     <label for="first-name-horizontal">Nama Pasien</label>
                                                     </div>
                                                     <div class="col-md-8 form-group">
-                                                    <input type="text" id="first-name-horizontal" class="form-control" :name="'fname'" :value="row.dkunjungan.kunjungan.pasien.nama" disabled>
+                                                    <input type="text" id="first-name-horizontal" class="form-control" :name="'fname'" :value="row.pasien.nama" disabled>
                                                     </div>
                                                     <div class="col-md-4">
                                                     <label for="total-horizontal">Total</label>
                                                     </div>
                                                     <div class="col-md-8 form-group">
-                                                    <input type="total" id="total-horizontal" class="form-control" :name="'total-id'" :value="row.dkunjungan.pembayaran" disabled>
+                                                    <input type="total" id="total-horizontal" class="form-control" :name="'total-id'" :value="row.detail_kunjungan.pembayaran" disabled>
                                                     </div>
                                                     <div class="col-md-4">
                                                     <label for="admin-info-horizontal">Admin</label>
@@ -106,9 +106,8 @@
                                             <i class="bx bx-x d-block d-sm-none"></i>
                                             <span class="d-none d-sm-block">Close</span>
                                             </button>
-                                            @csrf
-                                            @method('POST')
-                                            <button type="submit" class="btn btn-primary ms-1" :name="'status_pembayaran'" value="1">
+                                            
+                                            <button type="submit" class="btn btn-primary ms-1"  @click="updateStatus(row.kunjungan.id)" value="1" data-bs-dismiss="modal">
                                             <i class="bx bx-check d-block d-sm-none"></i>
                                             <span class="d-none d-sm-block">Accept</span>
                                             </button>
@@ -138,7 +137,7 @@
                               <div class="modal-content">
                                 <div class="modal-header">
                                   <h5 class="modal-title" :id="'paymentSuccessDetail' + row.id + 'Title'">
-                                    Receipt Pasien / {{ row.dkunjungan.kunjungan.pasien.nama }}
+                                    Receipt Pasien / {{ row.pasien.nama }}  
                                   </h5>
                                   <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
@@ -168,18 +167,18 @@
                                       
                                       <tbody class="fw-normal">
                                         
-                                        <tr v-if="row.dkunjungan.apotek_id">
+                                        <tr v-if="row.resep">
                                           <th colspan="6" class="p-2 fw-bolder">
                                             <div style="padding: 0 0 0 80px; border-bottom: 0px;" class="text-start">Drugs</div>
                                           </th>
                                         </tr>
-                                        <tr v-for="(item, index) in row.apotek" :key="index" class="fw-normal">
+                                        <tr v-if="row.resep" v-for="(item, index) in row.resep.detail_resep" :key="index" class="fw-normal">
                                           <th class="fw-normal">{{ index + 1 }}</th>
-                                          <th class="fw-normal px-4 text-start">{{ item.drug.name }}</th>
-                                          <th class="fw-normal">-</th>
-                                          <th class="fw-normal px-4 text-start">@money(item.drug.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.name }}</th>
+                                          <th class="fw-normal">{{ item.detail_obat.how_to_use }}</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.price }}</th>
                                           <th class="fw-normal">{{ item.quantity }}</th>
-                                          <th class="fw-normal px-4 text-start">@money(item.drug.price * item.quantity)</th>
+                                          <th class="fw-normal px-4 text-start">{{ item.detail_obat.price * item.quantity }}</th>
                                         </tr>
 
                                         
@@ -198,18 +197,18 @@
                                         </tr>
 
                                         
-                                        <tr v-if="row.dkunjungan.lab != null">
+                                        <tr v-if="row.result_lab != null">
                                           <th colspan="6" class="p-2 fw-bolder">
                                             <div style="padding: 0 0 0 80px;" class="text-start">Labs</div>
                                           </th>
                                         </tr>
-                                        <tr v-for="(lab, labIndex) in row.dkunjungan.lab" :key="labIndex" class="fw-normal">
+                                        <tr v-for="(lab, labIndex) in row.result_lab" :key="labIndex" class="fw-normal">
                                           <th class="fw-normal">{{ labIndex + 1 }}</th>
-                                          <th class="fw-normal px-4 text-start">{{ lab.name }}</th>
-                                          <th class="fw-normal">{{ lab.description || '-' }}</th>
-                                          <th class="fw-normal px-4 text-start">@money(lab.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{ lab.lab.name }}</th>
+                                          <th class="fw-normal">{{ lab.lab.description || '-' }}</th>
+                                          <th class="fw-normal px-4 text-start">{{lab.lab.price}}</th>
                                           <th class="fw-normal">1</th>
-                                          <th class="fw-normal px-4 text-start">@money(lab.price)</th>
+                                          <th class="fw-normal px-4 text-start">{{lab.lab.price}}</th>
                                         </tr>
                                       </tbody>
                                     </table>
@@ -221,10 +220,10 @@
                                       <div class="text-start">
                                         <div style="font-size: 12px;">- PT.PEMNS NPWP : 213131000</div>
                                         <div style="font-size: 12px;">- JIKA TERDAPAT KESALAHAN DAPAT MENGHUBUNGI KAMI</div>
-                                      </div>
+                                      </div>  
                                       <div class="text-start d-flex fw-bold" style="margin: 0 35px 0 0;">
                                         <div class="mx-4">Total Biaya</div>
-                                        <div class="mx-2">{{ row.dkunjungan.pembayaran }}</div>
+                                        <div class="mx-2">{{ row.detail_kunjungan.pembayaran }}</div>
                                       </div>
                                     </div>
                                   </div>
@@ -234,10 +233,10 @@
                                     <i class="bx bx-x d-block d-sm-none"></i>
                                     <span class="d-none d-sm-block fw-bold">CLOSE</span>
                                   </button>
-                                  <a class="btn btn-dark ms-1" :href="`/pembayaran-riwayat-cetak/${row.id}`" download>
+                                  <button class="btn btn-dark ms-1" :href="``" disabled>
                                     <i class="bx bx-check d-block d-sm-none"></i>
                                     <span class="d-none d-sm-block fw-bold">CETAK</span>
-                                  </a>
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -260,23 +259,25 @@
                         <select name="" id="" disabled>
                           <option value="15" class="disabled" selected>10</option>
                         </select>
-                        results of {{ invoice.length }}
+                        results of {{ invoice != null ? invoice.length : '0'}}
                       </p>
                     </ul>
-  
-                    <ul v-if="invoice.length">
-                      <li v-if="invoiceMeta.currentPage > 1">
-                        <a @click.prevent="getInvoices(invoiceMeta.currentPage - 1)" href="#">Previous</a>
-                      </li>
-  
-                      <li v-for="page in invoiceMeta.pages" :key="page" :class="{ active: page === invoiceMeta.currentPage }">
-                        <a @click.prevent="getInvoices(page)" href="#">{{ page }}</a>
-                      </li>
-  
-                      <li v-if="invoiceMeta.currentPage < invoiceMeta.lastPage">
-                        <a @click.prevent="getInvoices(invoiceMeta.currentPage + 1)" href="#">Next</a>
-                      </li>
-                    </ul>
+                    <!--
+
+                      <ul v-if="invoice.length">
+                        <li v-if="invoiceMeta.currentPage > 1">
+                          <a @click.prevent="getInvoices(invoiceMeta.currentPage - 1)" href="#">Previous</a>
+                        </li>
+                        
+                        <li v-for="page in invoiceMeta.pages" :key="page" :class="{ active: page === invoiceMeta.currentPage }">
+                          <a @click.prevent="getInvoices(page)" href="#">{{ page }}</a>
+                        </li>
+                        
+                        <li v-if="invoiceMeta.currentPage < invoiceMeta.lastPage">
+                          <a @click.prevent="getInvoices(invoiceMeta.currentPage + 1)" href="#">Next</a>
+                        </li>
+                      </ul>
+                    -->
                   </div>
                 </div>
               </div>
@@ -287,43 +288,80 @@
     </div>
   </template>
   
-  <script>
+  <script lang="ts">
+import axios from 'axios';
+interface Config {
+  [propName: string]: any;
+}
   export default {
     data() {
       return {
         // Add more data properties if needed
-        invoice: [
-        {
-          id: 1,
-          created_at: '2023-01-01',
-          dkunjungan: {
-            kunjungan: {
-              pasien: {
-                nama: 'John Doe'
-              }
-            },
-            pembayaran: 500.00
-          }
-        },
-        ],
-        invoiceMeta: {},
-        message: {}
+        // invoice: [
+        // {
+        //   id: 1,
+        //   created_at: '2023-01-01',
+        //   dkunjungan: {
+        //     kunjungan: {
+        //       pasien: {
+        //         nama: 'John Doe'
+        //       }
+        //     },
+        //     pembayaran: 500.00
+        //   }
+        // },
+        // ],
+        invoice : null as any,
+        invoiceMeta: {} as any,
+        message: {
+          alert : null
+        } as any
+        
       };
     },
-    methods: {
-      // Add methods for handling data retrieval if needed
-      closeAlert() {
-        this.message = {}
-      },
+    methods:{
+    closeAlert(){
+      this.message.alert = null
+    },
+    async updateStatus(detail:any){
+      try{
+        await axios.post('http://103.101.224.67:8084/pembayaran/status',
+          {
+            kunjungan_id: detail
+          },{
+          headers:{
+            'Content-type': 'application/json'
+          }
+          })
 
-      getInvoices(){
-
+          this.message.alert = res.data.alert
+      }catch(error:any){
+        console.error(error.message)
       }
     },
-    mounted() {
-      // Fetch data or perform any initialization logic here
-      this.getInvoices();
-    },
+    async fetchDataInvoice(){
+      try{
+
+        const res = await axios.get('http://103.101.224.67:8084/pembayaran/transaksi',{
+          headers:{
+            "Content-Type" : 'application/json'
+          }
+        })
+        
+        if(res.status == 200){
+          const data = res.data
+
+          this.invoice = data
+          console.log(data)
+        }
+      }catch(error:any){
+        console.error(error.message)
+      }
+    }
+  },
+  mounted(){
+    this.fetchDataInvoice()
+  }
   };
   </script>
   
