@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
@@ -19,6 +20,7 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@nuxt/ui": "^2.11.0",
     "@nuxtjs/color-mode": "^3.3.2",
     "@popperjs/core": "^2.11.8",
     "apexcharts": "^3.44.0",
@@ -27,6 +29,7 @@
     "bootstrap-icons": "^1.11.1",
     "date-fns": "^2.30.0",
     "feather-icons": "^4.29.1",
+    "moment": "^2.29.4",
     "perfect-scrollbar": "^1.5.5",
     "pinia": "^2.1.7",
     "sass": "^1.69.5",
