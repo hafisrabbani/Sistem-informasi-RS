@@ -149,7 +149,7 @@
             <div class="">
               <div class="card">
                 <div class="card-header">
-                  <h4>Statistik User</h4>
+                  <h4>Statistik Pasien</h4>
                 </div>
                 <div class="card-body">
                   <client-only>
