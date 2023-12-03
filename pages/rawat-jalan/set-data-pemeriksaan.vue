@@ -21,7 +21,16 @@
               <td>{{ detailkunjungan.id }}</td>
               <td>{{ detailkunjungan.nama }}</td>
               <td>{{ detailkunjungan.diagnosa }}</td>
-              <td>service apotek</td>
+              <td>
+                <NuxtLink :to="`/apotek/resep/${detailkunjungan.id}`">
+                  <button
+                    class="btn btn-primary fw-bold"
+                    style="min-width: 120px"
+                  >
+                    SET📝
+                  </button>
+                </NuxtLink>
+              </td>
               <td>
                 <span
                   v-if="detailkunjungan.apotek_id == null"
