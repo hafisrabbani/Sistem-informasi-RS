@@ -1,5 +1,8 @@
 <template>
-  <nuxt-link to="/apotek/stok-obat" class="btn btn-primary mb-3">
+  <nuxt-link
+    :to="`/apotek/resep/detailResep/${id}`"
+    class="btn btn-primary mb-3"
+  >
     <i class="bi bi-arrow-left"></i> Back
   </nuxt-link>
   <div class="card">
